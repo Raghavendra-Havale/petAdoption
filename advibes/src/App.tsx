@@ -61,19 +61,20 @@ function App() {
   const adImage = adSample; // Now using the local image
   const adLink = "https://www.petmart.com/";
 
-  // Timer for ad display
-  const adDisplayTime = useRef(0);
+  // Timer and click count for ad display
+  const [displayTime, setDisplayTime] = useState(0);
+  const [clickCount, setClickCount] = useState(0);
   const timer = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
     const start = Date.now();
     timer.current = setInterval(() => {
-      adDisplayTime.current = Date.now() - start;
+      setDisplayTime(Math.floor((Date.now() - start) / 1000));
     }, 1000);
 
     const handleUnload = () => {
       clearInterval(timer.current!);
-      console.log('Ad was displayed for', (adDisplayTime.current / 1000).toFixed(1), 'seconds');
+      console.log('Ad was displayed for', displayTime, 'seconds');
     };
 
     window.addEventListener('beforeunload', handleUnload);
@@ -82,6 +83,7 @@ function App() {
       window.removeEventListener('beforeunload', handleUnload);
       handleUnload();
     };
+    // eslint-disable-next-line
   }, []);
 
   const handlePetClick = (petId: number) => {
@@ -137,19 +139,26 @@ function App() {
 
       {/* Advertisement Section */}
       <section className="advertisement-section">
-        <div className="single-ad-wrapper">
-          <a
-            href={adLink}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="single-ad-link"
-            onClick={() => {
-              console.log('Ad clicked!');
-            }}
-          >
-            <img src={adImage} alt="Advertisement" className="single-ad-image" />
-            <span className="ad-label">Ad</span>
-          </a>
+        <div className="ad-flex-row">
+          <div className="single-ad-wrapper">
+            <a
+              href={adLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="single-ad-link"
+              onClick={() => {
+                setClickCount(c => c + 1);
+                console.log('Ad clicked!');
+              }}
+            >
+              <img src={adImage} alt="Advertisement" className="single-ad-image" />
+              <span className="ad-label">Ad</span>
+            </a>
+          </div>
+          <div className="ad-stats-box">
+            <div><strong>Ad Display Time:</strong> {displayTime} sec</div>
+            <div><strong>Ad Clicks:</strong> {clickCount}</div>
+          </div>
         </div>
       </section>
 
